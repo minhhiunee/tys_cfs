@@ -5,3 +5,9 @@ export type SubmissionStatus =
   | 'REJECTED'
   | 'POSTED'
   | 'HIDDEN';
+
+export interface AdminInfo {
+  id: string;
+  email: string;
+  role: string;
+}
