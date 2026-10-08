@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  POSTED
+  HIDDEN
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  INSTAGRAM
+  TIKTOK
+  THREADS
+  OTHER
+}
+
+model Admin {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(ADMIN)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+model Submission {
+  id              String           @id @default(uuid()) @db.Uuid
+  content         String
+  status          SubmissionStatus @default(PENDING)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
+  postedAt        DateTime?
+  socialCaption   String?
+  moderationNote  String?
+
+  media       Media[]
+  socialPosts SocialPost[]
+  auditLogs   AuditLog[]
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([createdAt])
+}
+
+model Media {
+  id               String    @id @default(uuid()) @db.Uuid
+  submissionId     String?   @db.Uuid
+  type             MediaType
+  storageKey       String    @unique
+  originalFilename String
+  mimeType         String
+  fileSize         Int
+  createdAt        DateTime  @default(now())
+
+  submission Submission? @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+
+  @@index([submissionId])
+}
+
+model SocialPost {
+  id           String         @id @default(uuid()) @db.Uuid
+  submissionId String         @db.Uuid
+  platform     SocialPlatform
+  caption      String?
+  externalUrl  String?
+  postedAt     DateTime?
+  createdAt    DateTime       @default(now())
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+}
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  adminId      String   @db.Uuid
+  action       String
+  submissionId String?  @db.Uuid
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  admin      Admin       @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  submission Submission? @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+
+  @@index([adminId, createdAt(sort: Desc)])
+  @@index([submissionId])
+}
