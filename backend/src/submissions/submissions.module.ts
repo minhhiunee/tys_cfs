@@ -1,5 +1,9 @@
 import { Module } from '@nestjs/common';
+import { SubmissionsService } from './submissions.service.js';
+import { SubmissionsController } from './submissions.controller.js';
 
-/** Public anonymous submissions — Phase 3+. */
-@Module({})
+@Module({
+  controllers: [SubmissionsController],
+  providers: [SubmissionsService],
+})
 export class SubmissionsModule {}

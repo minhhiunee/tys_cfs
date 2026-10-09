@@ -1,5 +1,10 @@
 import { Module } from '@nestjs/common';
+import { MediaService } from './media.service.js';
+import { MediaController } from './media.controller.js';
 
-/** Presigned R2 uploads — Phase 4+. */
-@Module({})
+@Module({
+  controllers: [MediaController],
+  providers: [MediaService],
+  exports: [MediaService],
+})
 export class MediaModule {}

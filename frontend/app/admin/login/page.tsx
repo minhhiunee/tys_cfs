@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
-      router.push('/admin');
+      window.location.href = '/admin';
     } catch (err) {
       const apiErr = err as ApiError;
       setError(apiErr.message || 'Login failed. Please try again.');
