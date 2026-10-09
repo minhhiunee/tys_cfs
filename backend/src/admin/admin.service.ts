@@ -40,6 +40,9 @@ export class AdminService {
         orderBy: { createdAt: 'desc' },
         include: {
           media: true,
+          socialPosts: {
+            orderBy: { createdAt: 'desc' }
+          },
         },
       }),
       this.prisma.submission.count({ where }),
@@ -56,11 +59,8 @@ export class AdminService {
     };
   }
 
-  async updateStatus(id: string, status: any, socialUrl?: string) {
+  async updateStatus(id: string, status: any) {
     const data: any = { status };
-    if (socialUrl) {
-      data.socialUrl = socialUrl;
-    }
     
     // Auto-update timestamps based on status
     if (status === 'APPROVED') data.approvedAt = new Date();
@@ -70,7 +70,7 @@ export class AdminService {
     return this.prisma.submission.update({
       where: { id },
       data,
-      include: { media: true }
+      include: { media: true, socialPosts: { orderBy: { createdAt: 'desc' } } }
     });
   }
 
@@ -78,7 +78,24 @@ export class AdminService {
     return this.prisma.submission.update({
       where: { id },
       data: { socialCaption },
-      include: { media: true }
+      include: { media: true, socialPosts: { orderBy: { createdAt: 'desc' } } }
+    });
+  }
+
+  async addSocialPost(submissionId: string, data: { platform: any, externalUrl?: string, caption?: string }) {
+    await this.prisma.socialPost.create({
+      data: {
+        submissionId,
+        platform: data.platform,
+        externalUrl: data.externalUrl,
+        caption: data.caption,
+        postedAt: new Date(),
+      }
+    });
+
+    return this.prisma.submission.findUnique({
+      where: { id: submissionId },
+      include: { media: true, socialPosts: { orderBy: { createdAt: 'desc' } } }
     });
   }
 

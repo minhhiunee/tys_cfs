@@ -54,7 +54,6 @@ model Submission {
   rejectedAt      DateTime?
   postedAt        DateTime?
   socialCaption   String?
-  socialUrl       String?
   moderationNote  String?
 
   media       Media[]

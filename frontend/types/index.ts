@@ -22,14 +22,24 @@ export interface Media {
   createdAt: string;
 }
 
+export interface SocialPost {
+  id: string;
+  submissionId: string;
+  platform: 'FACEBOOK' | 'INSTAGRAM' | 'TIKTOK' | 'THREADS' | 'OTHER';
+  caption?: string | null;
+  externalUrl?: string | null;
+  postedAt?: string | null;
+  createdAt: string;
+}
+
 export interface Submission {
   id: string;
   content: string;
   status: SubmissionStatus;
   createdAt: string;
   socialCaption?: string | null;
-  socialUrl?: string | null;
   moderationNote?: string | null;
   media: Media[];
+  socialPosts: SocialPost[];
 }
 

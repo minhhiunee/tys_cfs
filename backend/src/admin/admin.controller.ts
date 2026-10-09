@@ -2,6 +2,7 @@ import { Controller, Get, UseGuards, Query, Patch, Param, Body, Post, ForbiddenE
 import { AdminService } from './admin.service.js';
 import { AuthGuard } from '../auth/auth.guard.js';
 import { GetSubmissionsDto } from './dto/get-submissions.dto.js';
+import { AddSocialPostDto } from './dto/add-social-post.dto.js';
 
 @Controller('admin')
 @UseGuards(AuthGuard)
@@ -26,14 +27,18 @@ export class AdminController {
   async updateStatus(
     @Param('id') id: string,
     @Body('status') status: string,
-    @Body('socialUrl') socialUrl?: string,
   ) {
-    return this.adminService.updateStatus(id, status as any, socialUrl);
+    return this.adminService.updateStatus(id, status as any);
   }
 
   @Patch('submissions/:id/caption')
   async updateCaption(@Param('id') id: string, @Body('socialCaption') socialCaption: string) {
     return this.adminService.updateCaption(id, socialCaption);
+  }
+
+  @Post('submissions/:id/social-posts')
+  async addSocialPost(@Param('id') id: string, @Body() addSocialPostDto: AddSocialPostDto) {
+    return this.adminService.addSocialPost(id, addSocialPostDto);
   }
 
   @Post('submissions/:id/hard-delete')

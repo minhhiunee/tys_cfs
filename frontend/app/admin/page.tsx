@@ -56,6 +56,9 @@ export default function AdminDashboardPage() {
   const [editedCaption, setEditedCaption] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  const [newPlatform, setNewPlatform] = useState('FACEBOOK');
+  const [newUrl, setNewUrl] = useState('');
 
   useEffect(() => {
     apiFetch<{ admin: AdminInfo }>('/auth/me')
@@ -100,27 +103,40 @@ export default function AdminDashboardPage() {
   }
 
   async function updateStatus(id: string, status: SubmissionStatus) {
-    let socialUrl = undefined;
-    if (status === 'POSTED') {
-      const url = prompt('Nhập link bài viết trên MXH (để trống nếu không có):');
-      if (url === null) return; // Cancelled
-      socialUrl = url.trim();
-    }
-
     setIsUpdating(true);
     try {
       await apiFetch(`/admin/submissions/${id}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status, socialUrl })
+        body: JSON.stringify({ status })
       });
       // Refresh list & stats
-      setSubmissions(submissions.map(s => s.id === id ? { ...s, status, socialUrl } : s));
+      setSubmissions(submissions.map(s => s.id === id ? { ...s, status } : s));
       if (selectedSubmission) {
-        setSelectedSubmission({ ...selectedSubmission, status, socialUrl });
+        setSelectedSubmission({ ...selectedSubmission, status });
       }
       fetchStats();
     } catch (e) {
       alert('Lỗi cập nhật trạng thái');
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
+  async function handleAddSocialPost() {
+    if (!selectedSubmission) return;
+    setIsUpdating(true);
+    try {
+      const updatedSub = await apiFetch<Submission>(`/admin/submissions/${selectedSubmission.id}/social-posts`, {
+        method: 'POST',
+        body: JSON.stringify({ platform: newPlatform, externalUrl: newUrl, caption: editedCaption })
+      });
+      
+      setSubmissions(submissions.map(s => s.id === updatedSub.id ? updatedSub : s));
+      setSelectedSubmission(updatedSub);
+      setNewUrl('');
+      alert('Đã thêm bài đăng MXH!');
+    } catch (e) {
+      alert('Lỗi khi thêm bài đăng MXH');
     } finally {
       setIsUpdating(false);
     }
@@ -328,14 +344,6 @@ export default function AdminDashboardPage() {
                 <div className="rounded-[8px] bg-page p-4 text-[14px] whitespace-pre-wrap border border-border/50">
                   {selectedSubmission.content}
                 </div>
-                {selectedSubmission.socialUrl && (
-                  <div className="mt-2 text-[14px]">
-                    <span className="font-semibold mr-2">Link bài viết:</span>
-                    <a href={selectedSubmission.socialUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline break-all">
-                      {selectedSubmission.socialUrl}
-                    </a>
-                  </div>
-                )}
               </div>
 
               {selectedSubmission.media && selectedSubmission.media.length > 0 && (
@@ -375,6 +383,51 @@ export default function AdminDashboardPage() {
                   onChange={e => setEditedCaption(e.target.value)}
                   className="min-h-[160px]"
                 />
+              </div>
+
+              <div className="space-y-2 border-t border-border pt-4">
+                <label className="text-[14px] font-semibold">Các bài đã đăng trên MXH</label>
+                {selectedSubmission.socialPosts && selectedSubmission.socialPosts.length > 0 ? (
+                  <div className="space-y-2">
+                    {selectedSubmission.socialPosts.map(post => (
+                      <div key={post.id} className="flex flex-col gap-1 rounded-[8px] border border-border bg-page p-3 text-[14px]">
+                        <div className="flex items-center gap-2 font-semibold">
+                          <span className="px-2 py-1 bg-primary/10 text-primary rounded-[4px] text-[10px]">{post.platform}</span>
+                          <span className="text-text-secondary font-normal text-[12px]">{new Date(post.createdAt).toLocaleString()}</span>
+                        </div>
+                        {post.externalUrl && (
+                          <a href={post.externalUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline truncate">
+                            {post.externalUrl}
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[14px] text-text-secondary italic">Chưa có bài đăng nào.</p>
+                )}
+                
+                <div className="flex gap-2 pt-2">
+                  <select 
+                    value={newPlatform} 
+                    onChange={e => setNewPlatform(e.target.value)}
+                    className="h-10 rounded-md border border-border px-3 text-[14px] bg-white text-text-primary"
+                  >
+                    <option value="FACEBOOK">Facebook</option>
+                    <option value="INSTAGRAM">Instagram</option>
+                    <option value="TIKTOK">TikTok</option>
+                    <option value="THREADS">Threads</option>
+                    <option value="OTHER">Khác</option>
+                  </select>
+                  <input 
+                    type="url" 
+                    placeholder="Link bài đăng (tuỳ chọn)" 
+                    value={newUrl}
+                    onChange={e => setNewUrl(e.target.value)}
+                    className="h-10 flex-1 rounded-md border border-border px-3 text-[14px] bg-white text-text-primary"
+                  />
+                  <Button onClick={handleAddSocialPost} disabled={isUpdating}>Thêm</Button>
+                </div>
               </div>
             </div>
 
