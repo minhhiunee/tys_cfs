@@ -8,9 +8,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CFS — Anonymous submissions",
-  description:
-    "Submit anonymous confessions and content for moderation and social preparation.",
+  title: "TYS Confession",
+  description: "Một góc nhỏ để chia sẻ cùng TYS.",
+  icons: {
+    icon: "/logotys-01.png",
+  },
 };
 
 export default function RootLayout({

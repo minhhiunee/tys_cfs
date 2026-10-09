@@ -19,12 +19,33 @@ export default function Home() {
   const [status, setStatus] = useState<'idle' | 'uploading_media' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [progress, setProgress] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(Array.from(e.dataTransfer.files));
+    }
+  }
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     if (!e.target.files) return;
-    const selectedFiles = Array.from(e.target.files);
-    
+    processFiles(Array.from(e.target.files));
+  }
+
+  function processFiles(selectedFiles: File[]) {
     const newFiles = [...files, ...selectedFiles];
     const images = newFiles.filter(f => f.type.startsWith('image/'));
     const videos = newFiles.filter(f => f.type.startsWith('video/'));
@@ -128,10 +149,19 @@ export default function Home() {
   const isLoading = status === 'uploading_media' || status === 'submitting';
 
   return (
-    <div className="flex min-h-full flex-col bg-page text-text-primary">
-      <header className="sticky top-0 z-10 border-b border-border bg-white px-6 py-4 shadow-sm">
+    <div className="relative flex min-h-full flex-col bg-page text-text-primary overflow-hidden">
+      {/* Decorative Background */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        {/* Soft radial gradient layer */}
+        <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-gradient-to-br from-light-blue via-[#e0f4ff]/40 to-transparent opacity-70 blur-[100px]"></div>
+        <div className="absolute top-[10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-gradient-to-bl from-lavender/60 via-lavender/20 to-transparent opacity-60 blur-[100px]"></div>
+        {/* Abstract shape (bubble) */}
+        <div className="absolute top-[20%] right-[15%] w-[400px] h-[350px] rounded-[120px_60px_120px_100px] bg-primary/5 opacity-50 blur-[60px] rotate-12"></div>
+      </div>
+
+      <header className="sticky top-0 z-20 border-b border-border/60 bg-white/80 backdrop-blur-md px-6 py-4 shadow-[0_2px_10px_rgb(20,86,160,0.03)] transition-all">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
             <Image src="/logotys-01.png" alt="TYS Logo" width={40} height={40} className="object-contain" priority />
             <span className="text-xl font-bold tracking-tight text-navy">TYS <span className="font-normal text-text-secondary">/ Confession</span></span>
           </div>
@@ -141,13 +171,13 @@ export default function Home() {
             <Link href="#" className="hover:text-primary transition-colors">Nội quy</Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Button variant="outline" className="hidden md:inline-flex" onClick={() => window.location.href = '/admin'}>Quản trị viên</Button>
+            <Button variant="outline" className="hidden md:inline-flex border-primary/20 hover:border-primary/40" onClick={() => window.location.href = '/admin'}>Quản trị viên</Button>
             <Button className="h-10 px-4 text-[14px]" onClick={() => document.getElementById('form-section')?.scrollIntoView({ behavior: 'smooth' })}>Gửi lời nhắn</Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-6 py-12 md:flex-row">
+      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-6 py-12 md:flex-row">
         {/* Left Column: Form & Intro */}
         <div className="flex-1 space-y-12">
           {/* Hero Intro */}
@@ -177,14 +207,14 @@ export default function Home() {
                   <p className="text-text-secondary mb-8">
                     Cảm ơn bạn đã chia sẻ. TYS đã tiếp nhận lời nhắn của bạn.
                   </p>
-                  <Button onClick={() => setStatus('idle')} variant="outline">Gửi lời nhắn khác</Button>
+                  <Button onClick={() => setStatus('idle')} variant="outline" className="border-success/30 text-success hover:bg-success/10 hover:border-success/50">Gửi lời nhắn khác</Button>
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-border shadow-sm transition-all duration-300 hover:border-primary/20">
-                <CardHeader>
-                  <CardTitle className="text-navy text-2xl">Hôm nay, bạn muốn kể điều gì?</CardTitle>
-                  <p className="text-[14px] text-text-secondary">Cứ viết theo cách của bạn nhé. Một vài dòng cũng đủ để bắt đầu.</p>
+              <Card className="border-t-[3px] border-t-primary border-x-border border-b-border bg-white shadow-[0_8px_30px_rgb(20,86,160,0.06)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(20,86,160,0.1)] overflow-hidden rounded-xl">
+                <CardHeader className="bg-white/50 pb-4">
+                  <CardTitle className="text-navy text-[22px] font-bold">Hôm nay, bạn muốn kể điều gì?</CardTitle>
+                  <p className="text-[14px] text-text-secondary mt-1">Cứ viết theo cách của bạn nhé. Một vài dòng cũng đủ để bắt đầu.</p>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -214,10 +244,19 @@ export default function Home() {
                     <div className="space-y-2">
                       <label className="text-[14px] font-semibold text-navy">Muốn gửi kèm một tấm ảnh?</label>
                       <div 
-                        className={`group flex flex-col items-center justify-center gap-3 rounded-[12px] border-2 border-dashed ${files.length > 0 ? 'border-border/50 bg-light-blue/50' : 'border-border bg-page/30'} p-8 transition-colors hover:bg-light-blue/40`}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`group flex flex-col items-center justify-center gap-3 rounded-[12px] border-2 border-dashed p-8 transition-all duration-200 ${
+                          isDragging 
+                            ? 'border-primary bg-light-blue shadow-[0_0_20px_rgba(22,119,210,0.15)] scale-[1.01]' 
+                            : files.length > 0 
+                              ? 'border-border/50 bg-light-blue/40 hover:bg-light-blue/60' 
+                              : 'border-border bg-page/40 hover:bg-light-blue/30 hover:border-primary/40'
+                        }`}
                       >
-                        <UploadCloud className="text-primary/60 transition-transform group-hover:scale-110 group-hover:text-primary" size={32} />
-                        <p className="text-[14px] font-medium text-navy">Kéo thả tệp vào đây hoặc chọn từ thiết bị</p>
+                        <UploadCloud className={`${isDragging ? 'text-primary scale-125' : 'text-primary/60'} transition-transform duration-200 group-hover:scale-110 group-hover:text-primary`} size={32} />
+                        <p className={`text-[14px] font-medium transition-colors ${isDragging ? 'text-primary' : 'text-navy'}`}>Kéo thả tệp vào đây hoặc chọn từ thiết bị</p>
                         <p className="text-[12px] text-text-secondary text-center">Nếu có hình ảnh hay video muốn chia sẻ, bạn có thể đính kèm bên dưới. Không bắt buộc đâu nhé.<br/>Hỗ trợ JPEG, PNG, WebP hoặc MP4.</p>
                         <Button 
                           type="button" 
@@ -288,23 +327,27 @@ export default function Home() {
 
         {/* Right Column: Info Boxes */}
         <div className="w-full md:w-[320px] lg:w-[380px] shrink-0 space-y-6">
-          <Card className="bg-light-blue/40 border-primary/10 shadow-none">
-            <CardHeader className="pb-3">
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-[8px] bg-primary/10 text-primary">
-                <Shield size={20} />
+          <Card className="bg-light-blue/60 border-primary/10 shadow-[0_4px_20px_rgb(20,86,160,0.04)] backdrop-blur-sm">
+            <CardHeader className="pb-3 relative overflow-hidden">
+              <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-primary/5 rounded-full blur-xl pointer-events-none"></div>
+              <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-[10px] bg-white text-primary shadow-sm border border-primary/10 relative z-10">
+                <Shield size={22} className="opacity-90" />
               </div>
-              <CardTitle className="text-[18px] text-navy">Cùng nhau giữ một góc nhỏ tử tế</CardTitle>
+              <CardTitle className="text-[18px] text-navy font-bold relative z-10">Cùng nhau giữ một góc nhỏ tử tế</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-[14px] text-text-secondary">
+            <CardContent className="space-y-4 text-[14px] text-text-secondary leading-relaxed">
               <p>Đừng chia sẻ thông tin riêng tư của mình hay của người khác. Mỗi lời nhắn sẽ ý nghĩa hơn khi được viết bằng sự chân thành và tôn trọng.</p>
-              <p><strong className="text-text-primary">Không công kích, đe dọa</strong> hay lan truyền thông tin chưa được kiểm chứng.</p>
-              <Link href="#" className="inline-flex font-semibold text-primary hover:underline">Xem nội quy cộng đồng →</Link>
+              <p><strong className="text-navy font-semibold">Không công kích, đe dọa</strong> hay lan truyền thông tin chưa được kiểm chứng.</p>
+              <Link href="#" className="inline-flex items-center gap-1 font-semibold text-primary hover:text-primary-hover transition-colors mt-2 group">
+                Xem nội quy cộng đồng 
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </Link>
             </CardContent>
           </Card>
         </div>
       </main>
 
-      <footer className="border-t border-border bg-white py-8 text-center text-[14px] text-text-secondary">
+      <footer className="relative z-10 border-t border-border/60 bg-white/50 backdrop-blur-md py-8 text-center text-[14px] text-text-secondary">
         <p>TYS — Nơi những câu chuyện được sẻ chia.</p>
       </footer>
     </div>
