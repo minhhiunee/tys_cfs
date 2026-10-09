@@ -143,14 +143,12 @@ export default function AdminDashboardPage() {
   }
 
   async function hardDelete(id: string) {
-    const pwd = prompt('Nhập mật khẩu bí mật để xóa vĩnh viễn:');
-    if (!pwd) return;
+    if (!confirm('Bạn có chắc chắn muốn xóa vĩnh viễn bài đăng này? Hành động này không thể hoàn tác.')) return;
 
     setIsUpdating(true);
     try {
       await apiFetch(`/admin/submissions/${id}/hard-delete`, {
-        method: 'POST',
-        body: JSON.stringify({ password: pwd })
+        method: 'POST'
       });
       setSubmissions(submissions.filter(s => s.id !== id));
       setSelectedSubmission(null);
@@ -434,9 +432,11 @@ export default function AdminDashboardPage() {
             <div className="border-t border-border p-4 bg-page/50 flex flex-wrap justify-between gap-4">
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setSelectedSubmission(null)}>Đóng</Button>
-                <Button variant="outline" className="text-error border-error/20 hover:bg-error/5" onClick={() => hardDelete(selectedSubmission.id)} disabled={isUpdating}>
-                  <Trash2 size={16} className="mr-2" /> Xóa vĩnh viễn
-                </Button>
+                {admin?.role === 'SUPER_ADMIN' && (
+                  <Button variant="outline" className="text-error border-error/20 hover:bg-error/5" onClick={() => hardDelete(selectedSubmission.id)} disabled={isUpdating}>
+                    <Trash2 size={16} className="mr-2" /> Xóa vĩnh viễn
+                  </Button>
+                )}
               </div>
               <div className="flex gap-2">
                 {selectedSubmission.status === 'PENDING' && (

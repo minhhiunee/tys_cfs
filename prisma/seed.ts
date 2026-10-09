@@ -1,47 +1,46 @@
 /**
- * Seed script — creates the initial admin account.
+ * Seed script — creates the initial admin accounts.
  *
  * Usage:
  *   npx tsx prisma/seed.ts
- *
- * Reads from backend/.env:
- *   SEED_ADMIN_EMAIL   (default: admin@cfs.local)
- *   SEED_ADMIN_PASSWORD (required)
  */
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, AdminRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 async function main() {
   const prisma = new PrismaClient();
 
-  const email = process.env.SEED_ADMIN_EMAIL ?? 'admin@cfs.local';
-  const password = process.env.SEED_ADMIN_PASSWORD;
-
-  if (!password) {
-    console.error('❌ SEED_ADMIN_PASSWORD is not set in backend/.env');
-    process.exit(1);
-  }
-
-  const existing = await prisma.admin.findUnique({ where: { email } });
-
-  if (existing) {
-    console.log(`⚠️  Admin "${email}" already exists — skipping.`);
-    await prisma.$disconnect();
-    return;
-  }
-
+  const password = process.env.SEED_ADMIN_PASSWORD || 'Admin123!';
   const passwordHash = await bcrypt.hash(password, 12);
 
-  const admin = await prisma.admin.create({
-    data: {
-      email,
-      passwordHash,
-      role: 'ADMIN',
-    },
-  });
+  const accounts = [
+    { email: 'superadmin@cfs.local', role: 'SUPER_ADMIN' as AdminRole },
+    { email: 'admin1@cfs.local', role: 'ADMIN' as AdminRole },
+    { email: 'admin2@cfs.local', role: 'ADMIN' as AdminRole },
+    { email: 'admin3@cfs.local', role: 'ADMIN' as AdminRole },
+    { email: 'admin4@cfs.local', role: 'ADMIN' as AdminRole },
+  ];
 
-  console.log(`✅ Admin created: ${admin.email} (id: ${admin.id})`);
+  for (const account of accounts) {
+    const existing = await prisma.admin.findUnique({ where: { email: account.email } });
+    
+    if (!existing) {
+      const created = await prisma.admin.create({
+        data: {
+          email: account.email,
+          passwordHash,
+          role: account.role,
+        },
+      });
+      console.log(`✅ Admin created: ${created.email} (Role: ${created.role})`);
+    } else {
+      // If it exists but we want to ensure the role is correct (e.g. if we had admin@cfs.local before)
+      // we could update it, but for now we just skip.
+      console.log(`⚠️  Admin "${account.email}" already exists — skipping.`);
+    }
+  }
+
   await prisma.$disconnect();
 }
 
