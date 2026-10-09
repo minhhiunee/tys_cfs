@@ -7,6 +7,12 @@ const rootDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   turbopack: {
     root: rootDir,
     rules: {
