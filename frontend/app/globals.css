@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #1456A0;
-  --color-primary-hover: #1677D2; /* Bright interaction blue */
+  --color-primary: #155EEF; /* Royal blue */
+  --color-primary-hover: #0B3D91; /* Deep winter blue */
   --color-navy: #102D50;
-  --color-light-blue: #DDF2FF; /* Sky blue */
-  --color-page: #F4F8FF; /* Cloud-white */
+  --color-light-blue: #DFF3FF; /* Ice blue */
+  --color-page: #F4F9FF; /* Pale blue-white */
   --color-card: #FFFFFF;
   --color-lavender: #E9E7FF;
   --color-amber: #FFD98C;
+  --color-bright-sky: #38BDF8; /* Bright sky blue */
+  --color-deep-winter: #0B3D91; /* Deep winter blue */
   
   --color-text-primary: #102D50;
   --color-text-secondary: #64748B;
@@ -29,4 +31,37 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Snowfall Animation Keyframes */
+@keyframes snow-fall {
+  0% {
+    transform: translateY(-5vh);
+  }
+  100% {
+    transform: translateY(105vh);
+  }
+}
+
+@keyframes snow-drift {
+  0% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+  100% {
+    transform: translateX(-20px);
+  }
+}
+
+.snowflake {
+  position: absolute;
+  top: -5vh; /* Start slightly above the viewport */
+  border-radius: 50%;
+  pointer-events: none;
+  background-color: white;
+  animation: 
+    snow-fall var(--fall-duration) linear infinite var(--fall-delay),
+    snow-drift var(--drift-duration) ease-in-out infinite alternate var(--drift-delay);
 }

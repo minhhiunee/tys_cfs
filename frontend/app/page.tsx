@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Textarea } from '../components/ui/Textarea';
 import { UploadCloud, CheckCircle2, AlertCircle, X, Shield, FileText, Upload } from 'lucide-react';
+import { Snowfall } from '../components/ui/Snowfall';
 
 const MAX_IMAGES = 5;
 const MAX_VIDEOS = 1;
@@ -151,12 +152,20 @@ export default function Home() {
   return (
     <div className="relative flex min-h-full flex-col bg-page text-text-primary overflow-hidden">
       {/* Decorative Background */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        {/* Soft radial gradient layer */}
-        <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-gradient-to-br from-light-blue via-[#e0f4ff]/40 to-transparent opacity-70 blur-[100px]"></div>
-        <div className="absolute top-[10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-gradient-to-bl from-lavender/60 via-lavender/20 to-transparent opacity-60 blur-[100px]"></div>
-        {/* Abstract shape (bubble) */}
-        <div className="absolute top-[20%] right-[15%] w-[400px] h-[350px] rounded-[120px_60px_120px_100px] bg-primary/5 opacity-50 blur-[60px] rotate-12"></div>
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-page">
+        {/* Noticeable royal-blue glow near upper-left */}
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[60%] rounded-full bg-primary opacity-40 blur-[120px]"></div>
+        
+        {/* Cyan-blue light source behind hero section */}
+        <div className="absolute top-[10%] left-[10%] w-[40%] h-[50%] rounded-full bg-bright-sky opacity-30 blur-[100px]"></div>
+        
+        {/* Deeper blue region near bottom-right edge */}
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[70%] rounded-full bg-deep-winter opacity-30 blur-[140px]"></div>
+
+        {/* Pale icy blue around central content */}
+        <div className="absolute top-[20%] left-[20%] w-[60%] h-[60%] rounded-full bg-light-blue opacity-80 blur-[100px]"></div>
+        
+        <Snowfall />
       </div>
 
       <header className="sticky top-0 z-20 border-b border-border/60 bg-white/80 backdrop-blur-md px-6 py-4 shadow-[0_2px_10px_rgb(20,86,160,0.03)] transition-all">
@@ -211,7 +220,7 @@ export default function Home() {
                 </CardContent>
               </Card>
             ) : (
-              <Card className="border-t-[3px] border-t-primary border-x-border border-b-border bg-white shadow-[0_8px_30px_rgb(20,86,160,0.06)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(20,86,160,0.1)] overflow-hidden rounded-xl">
+              <Card className="border-t-[3px] border-t-primary border-x-border border-b-border bg-white shadow-[0_12px_40px_rgb(11,61,145,0.12)] transition-all duration-300 hover:shadow-[0_16px_50px_rgb(11,61,145,0.18)] overflow-hidden rounded-xl">
                 <CardHeader className="bg-white/50 pb-4">
                   <CardTitle className="text-navy text-[22px] font-bold">Hôm nay, bạn muốn kể điều gì?</CardTitle>
                   <p className="text-[14px] text-text-secondary mt-1">Cứ viết theo cách của bạn nhé. Một vài dòng cũng đủ để bắt đầu.</p>
@@ -255,7 +264,7 @@ export default function Home() {
                               : 'border-border bg-page/40 hover:bg-light-blue/30 hover:border-primary/40'
                         }`}
                       >
-                        <UploadCloud className={`${isDragging ? 'text-primary scale-125' : 'text-primary/60'} transition-transform duration-200 group-hover:scale-110 group-hover:text-primary`} size={32} />
+                        <UploadCloud className={`${isDragging ? 'text-bright-sky scale-125 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]' : 'text-primary/70'} transition-all duration-200 group-hover:scale-110 group-hover:text-bright-sky`} size={32} />
                         <p className={`text-[14px] font-medium transition-colors ${isDragging ? 'text-primary' : 'text-navy'}`}>Kéo thả tệp vào đây hoặc chọn từ thiết bị</p>
                         <p className="text-[12px] text-text-secondary text-center">Nếu có hình ảnh hay video muốn chia sẻ, bạn có thể đính kèm bên dưới. Không bắt buộc đâu nhé.<br/>Hỗ trợ JPEG, PNG, WebP hoặc MP4.</p>
                         <Button 
@@ -327,7 +336,7 @@ export default function Home() {
 
         {/* Right Column: Info Boxes */}
         <div className="w-full md:w-[320px] lg:w-[380px] shrink-0 space-y-6">
-          <Card className="bg-light-blue/60 border-primary/10 shadow-[0_4px_20px_rgb(20,86,160,0.04)] backdrop-blur-sm">
+          <Card className="bg-light-blue/40 border-primary/10 shadow-[0_8px_24px_rgb(11,61,145,0.08)] backdrop-blur-md">
             <CardHeader className="pb-3 relative overflow-hidden">
               <div className="absolute top-[-20px] right-[-20px] w-24 h-24 bg-primary/5 rounded-full blur-xl pointer-events-none"></div>
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-[10px] bg-white text-primary shadow-sm border border-primary/10 relative z-10">
