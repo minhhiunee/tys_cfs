@@ -27,4 +27,48 @@ export class AdminService {
 
     return stats;
   }
+  async getSubmissions(page: number, limit: number, status?: string) {
+    const skip = (page - 1) * limit;
+    
+    const where = status ? { status: status as any } : {};
+
+    const [items, total] = await Promise.all([
+      this.prisma.submission.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          media: true,
+        },
+      }),
+      this.prisma.submission.count({ where }),
+    ]);
+
+    return {
+      items,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async updateStatus(id: string, status: any) {
+    return this.prisma.submission.update({
+      where: { id },
+      data: { status },
+      include: { media: true }
+    });
+  }
+
+  async updateCaption(id: string, socialCaption: string) {
+    return this.prisma.submission.update({
+      where: { id },
+      data: { socialCaption },
+      include: { media: true }
+    });
+  }
 }

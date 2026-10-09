@@ -3,6 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { apiFetch, type ApiError } from '../../../lib/api';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
+import { Input } from '../../../components/ui/Input';
+import { Button } from '../../../components/ui/Button';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -24,79 +27,79 @@ export default function AdminLoginPage() {
       window.location.href = '/admin';
     } catch (err) {
       const apiErr = err as ApiError;
-      setError(apiErr.message || 'Login failed. Please try again.');
+      setError(apiErr.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
-      <div className="w-full max-w-sm">
-        <div className="rounded-xl border border-zinc-200 bg-white px-6 py-8 shadow-sm">
-          <h1 className="text-center text-xl font-semibold text-zinc-900">
-            CFS Admin
-          </h1>
-          <p className="mt-1 text-center text-sm text-zinc-500">
-            Sign in to your account
-          </p>
+    <div className="flex min-h-screen items-center justify-center bg-page px-4">
+      <div className="w-full max-w-[400px]">
+        <Card>
+          <CardHeader className="text-center pb-2">
+            <CardTitle className="text-[24px]">Quản trị viên</CardTitle>
+            <p className="mt-2 text-[14px] text-text-secondary">
+              Đăng nhập để quản lý confession
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="mt-4 space-y-5">
+              {error && (
+                <div className="rounded-[8px] border border-error/20 bg-error/5 px-4 py-3 text-[14px] text-error">
+                  {error}
+                </div>
+              )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                {error}
+              <div className="space-y-2">
+                <label
+                  htmlFor="email"
+                  className="block text-[14px] font-semibold text-text-primary"
+                >
+                  Email quản trị viên
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  autoFocus
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@example.test"
+                />
               </div>
-            )}
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-zinc-700"
+              <div className="space-y-2">
+                <label
+                  htmlFor="password"
+                  className="block text-[14px] font-semibold text-text-primary"
+                >
+                  Mật khẩu
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  minLength={6}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading}
+                isLoading={loading}
               >
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                autoComplete="email"
-                autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-                placeholder="admin@example.com"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-zinc-700"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                minLength={6}
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading ? 'Signing in…' : 'Sign in'}
-            </button>
-          </form>
-        </div>
+                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

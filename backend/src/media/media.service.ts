@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, HeadObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../common/prisma/prisma.service.js';
@@ -124,5 +124,21 @@ export class MediaService {
       storageKey: media.storageKey,
       type: media.type,
     };
+  }
+
+  async getDownloadUrl(storageKey: string) {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: storageKey,
+      });
+      const url = await getSignedUrl(this.s3Client, command, {
+        expiresIn: PRESIGNED_URL_TTL_SECONDS,
+      });
+      return url;
+    } catch (error) {
+      console.error('Failed to generate GET presigned URL', error);
+      throw new InternalServerErrorException('Could not generate view URL.');
+    }
   }
 }
