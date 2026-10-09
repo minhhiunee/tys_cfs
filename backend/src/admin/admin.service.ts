@@ -22,7 +22,7 @@ export class AdminService {
     };
 
     for (const row of counts) {
-      stats[row.status] = row._count.id;
+      stats[row.status as keyof typeof stats] = row._count.id;
     }
 
     return stats;

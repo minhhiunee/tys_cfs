@@ -30,7 +30,7 @@ export class AuditService {
           adminId,
           action,
           submissionId: submissionId ?? null,
-          metadata: (metadata as Prisma.InputJsonValue) ?? undefined,
+          metadata: (metadata as any) ?? undefined,
         },
       });
     } catch (error) {
