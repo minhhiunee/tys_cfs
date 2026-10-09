@@ -56,10 +56,20 @@ export class AdminService {
     };
   }
 
-  async updateStatus(id: string, status: any) {
+  async updateStatus(id: string, status: any, socialUrl?: string) {
+    const data: any = { status };
+    if (socialUrl) {
+      data.socialUrl = socialUrl;
+    }
+    
+    // Auto-update timestamps based on status
+    if (status === 'APPROVED') data.approvedAt = new Date();
+    if (status === 'REJECTED') data.rejectedAt = new Date();
+    if (status === 'POSTED') data.postedAt = new Date();
+
     return this.prisma.submission.update({
       where: { id },
-      data: { status },
+      data,
       include: { media: true }
     });
   }
@@ -69,6 +79,14 @@ export class AdminService {
       where: { id },
       data: { socialCaption },
       include: { media: true }
+    });
+  }
+
+  async hardDelete(id: string) {
+    // Due to Cascade on media and other relations, this will cleanly delete it from DB.
+    // Note: Cloudflare R2 files will remain orphaned in storage, but DB will be clean.
+    return this.prisma.submission.delete({
+      where: { id },
     });
   }
 }

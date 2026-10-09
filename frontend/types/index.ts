@@ -28,6 +28,7 @@ export interface Submission {
   status: SubmissionStatus;
   createdAt: string;
   socialCaption?: string | null;
+  socialUrl?: string | null;
   moderationNote?: string | null;
   media: Media[];
 }

@@ -54,6 +54,7 @@ model Submission {
   rejectedAt      DateTime?
   postedAt        DateTime?
   socialCaption   String?
+  socialUrl       String?
   moderationNote  String?
 
   media       Media[]
@@ -74,7 +75,7 @@ model Media {
   fileSize         Int
   createdAt        DateTime  @default(now())
 
-  submission Submission? @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+  submission Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
 }

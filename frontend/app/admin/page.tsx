@@ -10,7 +10,7 @@ import { Badge, type BadgeStatus } from '../../components/ui/Badge';
 import { Textarea } from '../../components/ui/Textarea';
 import { 
   LayoutDashboard, Clock, CheckCircle, XCircle, Share, List, LogOut, 
-  Search, X, Menu, ExternalLink, Download 
+  Search, X, Menu, ExternalLink, Download, Copy, Trash2
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -100,20 +100,48 @@ export default function AdminDashboardPage() {
   }
 
   async function updateStatus(id: string, status: SubmissionStatus) {
+    let socialUrl = undefined;
+    if (status === 'POSTED') {
+      const url = prompt('Nhập link bài viết trên MXH (để trống nếu không có):');
+      if (url === null) return; // Cancelled
+      socialUrl = url.trim();
+    }
+
     setIsUpdating(true);
     try {
       await apiFetch(`/admin/submissions/${id}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status, socialUrl })
       });
       // Refresh list & stats
-      setSubmissions(submissions.map(s => s.id === id ? { ...s, status } : s));
+      setSubmissions(submissions.map(s => s.id === id ? { ...s, status, socialUrl } : s));
       if (selectedSubmission) {
-        setSelectedSubmission({ ...selectedSubmission, status });
+        setSelectedSubmission({ ...selectedSubmission, status, socialUrl });
       }
       fetchStats();
     } catch (e) {
       alert('Lỗi cập nhật trạng thái');
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
+  async function hardDelete(id: string) {
+    const pwd = prompt('Nhập mật khẩu bí mật để xóa vĩnh viễn:');
+    if (!pwd) return;
+
+    setIsUpdating(true);
+    try {
+      await apiFetch(`/admin/submissions/${id}/hard-delete`, {
+        method: 'POST',
+        body: JSON.stringify({ password: pwd })
+      });
+      setSubmissions(submissions.filter(s => s.id !== id));
+      setSelectedSubmission(null);
+      fetchStats();
+      alert('Đã xóa vĩnh viễn!');
+    } catch (e: any) {
+      alert(e.message || 'Lỗi khi xóa bài');
     } finally {
       setIsUpdating(false);
     }
@@ -134,6 +162,13 @@ export default function AdminDashboardPage() {
       alert('Lỗi khi lưu caption');
     } finally {
       setIsUpdating(false);
+    }
+  }
+
+  function copyToClipboard() {
+    if (navigator.clipboard && editedCaption) {
+      navigator.clipboard.writeText(editedCaption);
+      alert('Đã sao chép vào khay nhớ tạm!');
     }
   }
 
@@ -293,6 +328,14 @@ export default function AdminDashboardPage() {
                 <div className="rounded-[8px] bg-page p-4 text-[14px] whitespace-pre-wrap border border-border/50">
                   {selectedSubmission.content}
                 </div>
+                {selectedSubmission.socialUrl && (
+                  <div className="mt-2 text-[14px]">
+                    <span className="font-semibold mr-2">Link bài viết:</span>
+                    <a href={selectedSubmission.socialUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline break-all">
+                      {selectedSubmission.socialUrl}
+                    </a>
+                  </div>
+                )}
               </div>
 
               {selectedSubmission.media && selectedSubmission.media.length > 0 && (
@@ -318,7 +361,14 @@ export default function AdminDashboardPage() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-[14px] font-semibold">Caption chuẩn bị (Dùng để đăng)</label>
-                  <Button variant="ghost" className="h-8 text-[12px] px-3 text-primary" onClick={saveCaption} disabled={isUpdating}>Lưu caption</Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="h-8 text-[12px] px-3 gap-1" onClick={copyToClipboard}>
+                      <Copy size={14} /> Sao chép
+                    </Button>
+                    <Button variant="ghost" className="h-8 text-[12px] px-3 text-primary" onClick={saveCaption} disabled={isUpdating}>
+                      Lưu caption
+                    </Button>
+                  </div>
                 </div>
                 <Textarea 
                   value={editedCaption}
@@ -329,8 +379,11 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="border-t border-border p-4 bg-page/50 flex flex-wrap justify-between gap-4">
-              <div>
+              <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setSelectedSubmission(null)}>Đóng</Button>
+                <Button variant="outline" className="text-error border-error/20 hover:bg-error/5" onClick={() => hardDelete(selectedSubmission.id)} disabled={isUpdating}>
+                  <Trash2 size={16} className="mr-2" /> Xóa vĩnh viễn
+                </Button>
               </div>
               <div className="flex gap-2">
                 {selectedSubmission.status === 'PENDING' && (
