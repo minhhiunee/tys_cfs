@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, type FormEvent, type ChangeEvent, useRef } from 'react';
 import { apiFetch, type ApiError } from '../lib/api';
 import { Button } from '../components/ui/Button';
@@ -128,19 +129,20 @@ export default function Home() {
 
   return (
     <div className="flex min-h-full flex-col bg-page text-text-primary">
-      <header className="sticky top-0 z-10 border-b border-border bg-white px-6 py-4">
+      <header className="sticky top-0 z-10 border-b border-border bg-white px-6 py-4 shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-tight text-primary">TYS <span className="font-normal text-text-secondary">/ Confession</span></span>
+          <div className="flex items-center gap-3">
+            <Image src="/logotys-01.png" alt="TYS Logo" width={40} height={40} className="object-contain" priority />
+            <span className="text-xl font-bold tracking-tight text-navy">TYS <span className="font-normal text-text-secondary">/ Confession</span></span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-[14px] font-medium text-text-secondary">
             <Link href="/" className="text-primary font-semibold">Trang chủ</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Cách hoạt động</Link>
+            <Link href="#" className="hover:text-primary transition-colors">Cách gửi lời nhắn</Link>
             <Link href="#" className="hover:text-primary transition-colors">Nội quy</Link>
           </nav>
           <div className="flex items-center gap-4">
             <Button variant="outline" className="hidden md:inline-flex" onClick={() => window.location.href = '/admin'}>Quản trị viên</Button>
-            <Button className="h-10 px-4 text-[14px]" onClick={() => document.getElementById('form-section')?.scrollIntoView({ behavior: 'smooth' })}>Gửi confession</Button>
+            <Button className="h-10 px-4 text-[14px]" onClick={() => document.getElementById('form-section')?.scrollIntoView({ behavior: 'smooth' })}>Gửi lời nhắn</Button>
           </div>
         </div>
       </header>
@@ -150,44 +152,44 @@ export default function Home() {
         <div className="flex-1 space-y-12">
           {/* Hero Intro */}
           <div className="space-y-4">
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary">Chia sẻ ẩn danh · Không cần tài khoản</p>
-            <h1 className="text-[42px] font-bold leading-[50px] tracking-tight">
-              Điều bạn muốn chia sẻ, TYS luôn lắng nghe.
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary">Một góc nhỏ để chia sẻ cùng TYS</p>
+            <h1 className="text-[42px] font-bold leading-[50px] tracking-tight text-navy">
+              Có điều muốn nói? Kể TYS nghe nhé.
             </h1>
             <p className="text-lg text-text-secondary">
-              Gửi câu chuyện, tâm sự hoặc lời nhắn của bạn đến TYS. Bạn không cần tạo tài khoản để gửi confession.
+              Một lời cảm ơn, một câu chuyện nho nhỏ hay điều bạn vẫn giữ trong lòng — bạn có thể chia sẻ tại đây. TYS sẽ lắng nghe.
             </p>
             <div className="flex items-center gap-4 pt-4">
-              <Button onClick={() => document.getElementById('form-section')?.scrollIntoView({ behavior: 'smooth' })}>Gửi confession</Button>
-              <Button variant="ghost">Tìm hiểu cách hoạt động</Button>
+              <Button onClick={() => document.getElementById('form-section')?.scrollIntoView({ behavior: 'smooth' })}>Gửi lời nhắn</Button>
+              <Button variant="ghost">Cách gửi lời nhắn</Button>
             </div>
           </div>
 
           {/* Submission Form Section */}
           <div id="form-section">
             {status === 'success' ? (
-              <Card className="border-success/20 bg-success/5 shadow-none">
+              <Card className="border-success/20 bg-success/5 shadow-none transition-all duration-300">
                 <CardContent className="flex flex-col items-center justify-center p-12 text-center">
                   <div className="mb-4 rounded-full bg-success/10 p-3 text-success">
                     <CheckCircle2 size={32} />
                   </div>
-                  <CardTitle className="mb-2 text-2xl text-success">Gửi confession thành công!</CardTitle>
+                  <CardTitle className="mb-2 text-2xl text-success">Đã gửi thành công</CardTitle>
                   <p className="text-text-secondary mb-8">
-                    Cảm ơn bạn đã chia sẻ cùng TYS. Nội dung của bạn đang chờ quản trị viên kiểm duyệt trước khi được đăng tải.
+                    Cảm ơn bạn đã chia sẻ. TYS đã tiếp nhận lời nhắn của bạn.
                   </p>
-                  <Button onClick={() => setStatus('idle')} variant="outline">Gửi confession khác</Button>
+                  <Button onClick={() => setStatus('idle')} variant="outline">Gửi lời nhắn khác</Button>
                 </CardContent>
               </Card>
             ) : (
-              <Card>
+              <Card className="border-border shadow-sm transition-all duration-300 hover:border-primary/20">
                 <CardHeader>
-                  <CardTitle>Bạn muốn chia sẻ điều gì?</CardTitle>
-                  <p className="text-[14px] text-text-secondary">Một lời nhắn nhỏ, một câu chuyện thật. TYS lắng nghe bạn.</p>
+                  <CardTitle className="text-navy text-2xl">Hôm nay, bạn muốn kể điều gì?</CardTitle>
+                  <p className="text-[14px] text-text-secondary">Cứ viết theo cách của bạn nhé. Một vài dòng cũng đủ để bắt đầu.</p>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                     {status === 'error' && (
-                      <div className="flex items-center gap-3 rounded-[8px] border border-error/20 bg-error/5 p-4 text-[14px] text-error">
+                      <div className="flex items-center gap-3 rounded-[8px] border border-error/20 bg-error/5 p-4 text-[14px] text-error transition-all duration-300">
                         <AlertCircle size={20} />
                         <p>{errorMessage}</p>
                       </div>
@@ -195,14 +197,14 @@ export default function Home() {
 
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <label className="text-[14px] font-semibold">Nội dung confession <span className="text-error">*</span></label>
+                        <label className="text-[14px] font-semibold text-navy">Nội dung lời nhắn <span className="text-error">*</span></label>
                         <span className="text-[12px] text-text-secondary">{content.length} / {MAX_CHARS} ký tự</span>
                       </div>
                       <Textarea
                         required
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="Viết những điều bạn muốn gửi đến TYS..."
+                        placeholder="Có điều gì bạn muốn gửi đến TYS hoặc mọi người? Viết ở đây nhé…"
                         rows={6}
                         disabled={isLoading}
                         error={content.length > MAX_CHARS || (status === 'error' && content.trim().length < 20)}
@@ -210,21 +212,21 @@ export default function Home() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[14px] font-semibold">Ảnh hoặc video đính kèm (không bắt buộc)</label>
+                      <label className="text-[14px] font-semibold text-navy">Muốn gửi kèm một tấm ảnh?</label>
                       <div 
-                        className={`flex flex-col items-center justify-center gap-3 rounded-[12px] border-2 border-dashed ${files.length > 0 ? 'border-border/50 bg-page/50' : 'border-border bg-page/30'} p-8 transition-colors hover:bg-page`}
+                        className={`group flex flex-col items-center justify-center gap-3 rounded-[12px] border-2 border-dashed ${files.length > 0 ? 'border-border/50 bg-light-blue/50' : 'border-border bg-page/30'} p-8 transition-colors hover:bg-light-blue/40`}
                       >
-                        <UploadCloud className="text-primary opacity-50" size={32} />
-                        <p className="text-[14px] font-medium">Kéo thả ảnh hoặc video vào đây</p>
-                        <p className="text-[12px] text-text-secondary text-center">JPEG, PNG, WebP - MP4, MOV nếu được hỗ trợ<br/>Tập đính kèm là tùy chọn, không chỉnh sửa media.</p>
+                        <UploadCloud className="text-primary/60 transition-transform group-hover:scale-110 group-hover:text-primary" size={32} />
+                        <p className="text-[14px] font-medium text-navy">Kéo thả tệp vào đây hoặc chọn từ thiết bị</p>
+                        <p className="text-[12px] text-text-secondary text-center">Nếu có hình ảnh hay video muốn chia sẻ, bạn có thể đính kèm bên dưới. Không bắt buộc đâu nhé.<br/>Hỗ trợ JPEG, PNG, WebP hoặc MP4.</p>
                         <Button 
                           type="button" 
                           variant="outline" 
-                          className="mt-2 h-10 px-4 text-[14px]"
+                          className="mt-2 h-10 px-4 text-[14px] border-primary/20 text-primary hover:bg-light-blue"
                           onClick={() => fileInputRef.current?.click()}
                           disabled={isLoading}
                         >
-                          Thêm ảnh hoặc video
+                          Chọn ảnh hoặc video
                         </Button>
                         <input
                           ref={fileInputRef}
@@ -240,23 +242,23 @@ export default function Home() {
                       {files.length > 0 && (
                         <div className="mt-4 flex flex-col gap-2">
                           {files.map((file, idx) => (
-                            <div key={idx} className="flex items-center justify-between rounded-[8px] border border-border bg-white p-3 shadow-sm">
+                            <div key={idx} className="flex items-center justify-between rounded-[8px] border border-border bg-white p-3 shadow-sm transition-all hover:border-primary/30">
                               <div className="flex items-center gap-3 overflow-hidden">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[6px] bg-page text-primary">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[6px] bg-light-blue text-primary">
                                   {file.type.startsWith('image/') ? <Upload size={20} /> : <FileText size={20} />}
                                 </div>
                                 <div className="flex flex-col overflow-hidden">
-                                  <span className="truncate text-[14px] font-medium">{file.name}</span>
+                                  <span className="truncate text-[14px] font-medium text-navy">{file.name}</span>
                                   <span className="text-[12px] text-text-secondary">{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
                                 </div>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => removeFile(idx)}
-                                className="p-2 text-text-secondary hover:text-error transition-colors"
+                                className="p-2 text-text-secondary hover:text-error hover:bg-error/10 rounded-full transition-colors"
                                 disabled={isLoading}
                               >
-                                <X size={20} />
+                                <X size={18} />
                               </button>
                             </div>
                           ))}
@@ -267,14 +269,14 @@ export default function Home() {
                     <div className="pt-2">
                       <Button
                         type="submit"
-                        className="w-full"
+                        className="w-full text-lg shadow-sm"
                         disabled={isLoading}
                         isLoading={isLoading}
                       >
-                        {isLoading ? progress : 'Gửi confession'}
+                        {isLoading ? 'Đang gửi...' : 'Gửi lời nhắn'}
                       </Button>
                       <p className="mt-4 text-center text-[12px] text-text-secondary">
-                        Bằng việc gửi, bạn đồng ý với các <a href="#" className="text-primary hover:underline">nội quy cộng đồng</a> của TYS.
+                        Trước khi gửi, bạn nhớ xem qua <Link href="#" className="text-primary hover:underline">nội quy cộng đồng</Link> nhé.
                       </p>
                     </div>
                   </form>
@@ -286,25 +288,24 @@ export default function Home() {
 
         {/* Right Column: Info Boxes */}
         <div className="w-full md:w-[320px] lg:w-[380px] shrink-0 space-y-6">
-          <Card className="bg-light-blue/30 border-none shadow-none">
+          <Card className="bg-light-blue/40 border-primary/10 shadow-none">
             <CardHeader className="pb-3">
               <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-[8px] bg-primary/10 text-primary">
                 <Shield size={20} />
               </div>
-              <CardTitle className="text-[18px]">Gửi bằng sự tôn trọng</CardTitle>
+              <CardTitle className="text-[18px] text-navy">Cùng nhau giữ một góc nhỏ tử tế</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-[14px] text-text-secondary">
-              <p><strong className="text-text-primary">Không chia sẻ thông tin cá nhân</strong> của mình hoặc người khác.</p>
-              <p><strong className="text-text-primary">Không quấy rối, đe dọa</strong> hay đưa ra cáo buộc ác ý.</p>
-              <p>Quản trị viên có thể từ chối nội dung không phù hợp.</p>
-              <Link href="#" className="inline-flex font-semibold text-primary hover:underline">Đọc đầy đủ nội quy →</Link>
+              <p>Đừng chia sẻ thông tin riêng tư của mình hay của người khác. Mỗi lời nhắn sẽ ý nghĩa hơn khi được viết bằng sự chân thành và tôn trọng.</p>
+              <p><strong className="text-text-primary">Không công kích, đe dọa</strong> hay lan truyền thông tin chưa được kiểm chứng.</p>
+              <Link href="#" className="inline-flex font-semibold text-primary hover:underline">Xem nội quy cộng đồng →</Link>
             </CardContent>
           </Card>
         </div>
       </main>
 
       <footer className="border-t border-border bg-white py-8 text-center text-[14px] text-text-secondary">
-        <p>TYS — Chung một mái nhà.</p>
+        <p>TYS — Nơi những câu chuyện được sẻ chia.</p>
       </footer>
     </div>
   );

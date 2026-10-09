@@ -205,8 +205,9 @@ export default function AdminDashboardPage() {
 
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-[240px] border-r border-border bg-white transition-transform duration-300 md:static md:translate-x-0 flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex h-16 items-center px-6 border-b border-border">
-          <span className="text-lg font-bold text-primary tracking-tight">CFS Admin</span>
+        <div className="flex h-16 items-center gap-3 px-6 border-b border-border">
+          <img src="/logotys-01.png" alt="TYS Logo" className="h-8 w-auto object-contain" />
+          <span className="text-lg font-bold text-navy tracking-tight">CFS Admin</span>
         </div>
         
         <div className="flex-1 overflow-y-auto py-6">
@@ -252,7 +253,10 @@ export default function AdminDashboardPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-white px-6 md:hidden">
-          <span className="text-lg font-bold text-primary">CFS Admin</span>
+          <div className="flex items-center gap-3">
+            <img src="/logotys-01.png" alt="TYS Logo" className="h-8 w-auto object-contain" />
+            <span className="text-lg font-bold text-navy">CFS Admin</span>
+          </div>
           <button onClick={() => setIsSidebarOpen(true)} className="p-2 -mr-2 text-text-secondary">
             <Menu size={24} />
           </button>
@@ -260,7 +264,7 @@ export default function AdminDashboardPage() {
 
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
           <div className="mx-auto max-w-5xl">
-            <h1 className="text-2xl font-bold mb-6 text-text-primary">
+            <h1 className="text-2xl font-bold mb-6 text-navy">
               {TABS.find(t => t.id === activeTab)?.label}
             </h1>
 

@@ -36,11 +36,14 @@ export default function AdminLoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-page px-4">
       <div className="w-full max-w-[400px]">
-        <Card>
+        <Card className="border-border shadow-sm">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-[24px]">Quản trị viên</CardTitle>
+            <div className="flex justify-center mb-4">
+               <img src="/logotys-01.png" alt="TYS Logo" className="h-12 w-auto object-contain" />
+            </div>
+            <CardTitle className="text-[24px] text-navy">Quản trị viên TYS</CardTitle>
             <p className="mt-2 text-[14px] text-text-secondary">
-              Đăng nhập để quản lý confession
+              Đăng nhập để quản lý lời nhắn
             </p>
           </CardHeader>
           <CardContent>
@@ -54,9 +57,9 @@ export default function AdminLoginPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="email"
-                  className="block text-[14px] font-semibold text-text-primary"
+                  className="block text-[14px] font-semibold text-navy"
                 >
-                  Email quản trị viên
+                  Email đăng nhập
                 </label>
                 <Input
                   id="email"
